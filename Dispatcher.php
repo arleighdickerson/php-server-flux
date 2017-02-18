@@ -81,15 +81,20 @@ class Dispatcher extends Component {
             !$this->_isDispatching,
             'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.'
         );
-        $this->startDispatching($payload);
-        try {
-            foreach ($this->_callbacks as $id => $callback) {
-                if (!$this->_isPending[$id]) {
-                    $this->invokeCallback($id);
+        $event = new DispatcherEvent($payload);
+        $this->trigger(self::EVENT_BEFORE_DISPATCH, $event);
+        if ($event->isValid) {
+            $this->startDispatching($payload);
+            try {
+                foreach ($this->_callbacks as $id => $callback) {
+                    if (!$this->_isPending[$id]) {
+                        $this->invokeCallback($id);
+                    }
                 }
+            } finally {
+                $this->stopDispatching();
             }
-        } finally {
-            $this->stopDispatching();
+            $this->trigger(self::EVENT_AFTER_DISPATCH, $event);
         }
     }
 
@@ -112,16 +117,13 @@ class Dispatcher extends Component {
             $this->_isPending[$id] = false;
             $this->_isHandled[$id] = false;
         }
-        $this->trigger(self::EVENT_BEFORE_DISPATCH, new DispatcherEvent($payload));
         $this->_pendingPayload = $payload;
         $this->_isDispatching = true;
     }
 
     private function stopDispatching() {
-        $payload = $this->_pendingPayload;
         $this->_pendingPayload = null;
         $this->_isDispatching = false;
-        $this->trigger(self::EVENT_AFTER_DISPATCH, new DispatcherEvent($payload));
     }
 
     private function assert($truthy, $message, $value = '') {
@@ -139,3 +141,4 @@ class Dispatcher extends Component {
         return $callableOrId;
     }
 }
+

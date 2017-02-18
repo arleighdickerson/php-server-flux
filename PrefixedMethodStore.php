@@ -85,3 +85,4 @@ abstract class PrefixedMethodStore extends Store {
         return $args;
     }
 }
+

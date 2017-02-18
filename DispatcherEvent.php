@@ -11,6 +11,8 @@ use yii\base\Event;
  * @package flux
  */
 class DispatcherEvent extends Event {
+    public $isValid = true;
+
     /**
      * @var array
      */
@@ -25,3 +27,4 @@ class DispatcherEvent extends Event {
         return $this->_payload;
     }
 }
+

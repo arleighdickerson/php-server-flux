@@ -74,3 +74,4 @@ abstract class Store extends Component {
         }
     }
 }
+
