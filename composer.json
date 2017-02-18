@@ -1,0 +1,21 @@
+{
+	"name": "aea/flux",
+	"description": "server flux components for yii2",
+	"type": "yii2-extension",
+	"keywords": ["yii2","flux","server flux","event sourcing"],
+	"license": "BSD-4-Clause",
+	"authors": [
+		{
+			"name": "Arleigh Dickerson",
+			"email": "a.dickerson@aeapubs.org"
+		}
+	],
+	"require": {
+		"yiisoft/yii2": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"flux\\": ""
+		}
+	}
+}
