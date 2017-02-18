@@ -13,8 +13,6 @@ use yii\helpers\StringHelper;
  * @package flux
  */
 abstract class PrefixedMethodStore extends Store {
-    private static $_methodMap;
-
     const HANDLER_METHOD_PREFIX = 'handle';
 
     protected final function onDispatch($payload) {
@@ -25,23 +23,20 @@ abstract class PrefixedMethodStore extends Store {
     }
 
     private function getMethodMap() {
-        if (static::$_methodMap === null) {
-            $reflector = new \ReflectionClass($this);
-            $methods = array_filter($reflector->getMethods(), function (\ReflectionMethod $method) {
-                return StringHelper::startsWith($method->getName(), self::HANDLER_METHOD_PREFIX)
-                    && $method->getName() != self::HANDLER_METHOD_PREFIX;
-            });
-            $names = ArrayHelper::getColumn($methods, function (\ReflectionMethod $method) {
-                return $method->getName();
-            });
-            static::$_methodMap = ArrayHelper::index(
-                $names,
-                function ($name) {
-                    return lcfirst(substr($name, strlen(self::HANDLER_METHOD_PREFIX)));
-                }
-            );
-        }
-        return static::$_methodMap;
+        $reflector = new \ReflectionClass($this);
+        $methods = array_filter($reflector->getMethods(), function (\ReflectionMethod $method) {
+            return StringHelper::startsWith($method->getName(), self::HANDLER_METHOD_PREFIX)
+                && $method->getName() != self::HANDLER_METHOD_PREFIX;
+        });
+        $names = ArrayHelper::getColumn($methods, function (\ReflectionMethod $method) {
+            return $method->getName();
+        });
+        return ArrayHelper::index(
+            $names,
+            function ($name) {
+                return lcfirst(substr($name, strlen(self::HANDLER_METHOD_PREFIX)));
+            }
+        );
     }
 
     private function applyToPayload($method, array $payload) {
@@ -85,4 +80,3 @@ abstract class PrefixedMethodStore extends Store {
         return $args;
     }
 }
-
