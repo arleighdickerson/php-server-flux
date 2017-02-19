@@ -31,7 +31,9 @@ abstract class Store extends Component {
     protected abstract function onDispatch($payload);
 
     public function addListener($callback) {
-        $this->on(self::EVENT_ON_CHANGE, $callback);
+        $this->on(self::EVENT_ON_CHANGE, function (DispatcherEvent $event) use ($callback) {
+            KwArgs::apply($callback, $event->getPayload());
+        });
     }
 
     public function getDispatcher() {
@@ -56,7 +58,7 @@ abstract class Store extends Component {
         $this->_changed = false;
         $this->onDispatch($payload);
         if ($this->_changed) {
-            $this->trigger(self::EVENT_ON_CHANGE);
+            $this->trigger(self::EVENT_ON_CHANGE, new DispatcherEvent($payload));
         }
     }
 
