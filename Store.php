@@ -4,14 +4,17 @@
 namespace flux;
 
 
+use Yii;
 use yii\base\Component;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 
 /**
  * Class Store
  * @package flux
  * @property Dispatcher $dispatcher
+ * @property string $dispatcherToken
  */
 abstract class Store extends Component {
     const EVENT_ON_CHANGE = 'change';
@@ -20,12 +23,19 @@ abstract class Store extends Component {
     private $_changed = false;
     private $_dispatcher;
 
-    public function __construct(Dispatcher $dispatcher, array $config = []) {
-        $this->_dispatcher = $dispatcher;
-        $this->_dispatchToken = $dispatcher->register(function ($payload) {
+    public function __construct(array $config = []) {
+        $this->_dispatcher = ArrayHelper::remove($config, 'dispatcher');
+        parent::__construct($config);
+    }
+
+    public function init() {
+        parent::init();
+        if ($this->_dispatcher === null) {
+            $this->_dispatcher = Yii::$container->get(Dispatcher::class);
+        }
+        $this->_dispatchToken = $this->_dispatcher->register(function ($payload) {
             $this->invokeOnDispatch($payload);
         });
-        parent::__construct($config);
     }
 
     protected abstract function onDispatch($payload);
