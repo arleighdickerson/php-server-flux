@@ -31,10 +31,11 @@ abstract class AnnotatedMethodStore extends Store {
 
     protected function onDispatch($payload) {
         if (isset($payload['type'])) {
-            foreach (ArrayHelper::getValue($this->getMethodMap(), $payload['type'], []) as $methods) {
-                foreach ($methods as $method) {
-                    KwArgs::apply([$this, $method], $payload);
-                }
+            $methods = array_filter($this->getMethodMap(), function ($types) use ($payload) {
+                return in_array($payload['type'], $types);
+            });
+            foreach ($methods as $method => $events) {
+                KwArgs::apply([$this, $method], $payload);
             }
         }
     }
