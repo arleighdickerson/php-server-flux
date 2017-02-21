@@ -1,9 +1,9 @@
 <?php
 
 
-use flux\Dispatcher;
-use flux\DispatchEvent;
-use flux\HandlerMapTrait;
+use aea\flux\Dispatcher;
+use aea\flux\DispatchEvent;
+use aea\flux\HandlerMap;
 
 class HandlerMapTest extends PHPUnit_Framework_TestCase {
     const ACTION_ONE = 'ACTION_ONE';
@@ -40,15 +40,15 @@ class HandlerMapTest extends PHPUnit_Framework_TestCase {
     public static $result;
 }
 
-class HandlerMappedStore extends flux\Store {
-    use HandlerMapTrait;
+class HandlerMappedStore extends aea\flux\Store {
+    use HandlerMap;
 
-    protected function handlerMap() {
+    protected function handlers() {
         return [
             HandlerMapTest::ACTION_ONE => function ($type, $event) {
                 HandlerMapTest::$result = $event;
             },
-            HandlerMapTest::ACTION_TWO=> function ($type, $value) {
+            HandlerMapTest::ACTION_TWO => function ($type, $value) {
                 HandlerMapTest::$result = $value;
             },
             function ($payload) {

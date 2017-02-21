@@ -1,6 +1,6 @@
 <?php
 
-namespace flux;
+namespace aea\flux;
 
 use yii\base\Component;
 use yii\base\Exception;
@@ -84,10 +84,10 @@ class Dispatcher extends Component {
             'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.'
         );
 
+        /** @var DispatchEvent $event */
         $event = $action instanceof DispatchEvent
             ? $action
             : new DispatchEvent(['payload' => $action]);
-        /** @var DispatchEvent $event */
 
         $this->trigger(self::EVENT_BEFORE_DISPATCH, $event);
         $this->startDispatching($event);
@@ -150,4 +150,3 @@ class Dispatcher extends Component {
         return $callableOrId;
     }
 }
-

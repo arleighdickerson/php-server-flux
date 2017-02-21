@@ -1,9 +1,10 @@
 <?php
 
 
-namespace flux;
+namespace aea\flux;
 
 
+use aea\flux\util\NamedParameters;
 use Yii;
 use yii\base\Component;
 use yii\base\Exception;
@@ -42,7 +43,7 @@ abstract class Store extends Component {
 
     public function addListener($callback) {
         $this->on(self::EVENT_ON_CHANGE, function (DispatchEvent $event) use ($callback) {
-            return KwArgs::apply($callback, $event);
+            return NamedParameters::apply($callback, $event);
         });
     }
 
@@ -86,4 +87,3 @@ abstract class Store extends Component {
         }
     }
 }
-

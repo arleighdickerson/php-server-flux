@@ -1,35 +1,40 @@
 <?php
 
 
-namespace flux;
+namespace aea\flux\util;
 
 
+use aea\flux\DispatchEvent;
 use yii\base\Exception;
 use yii\helpers\VarDumper;
 
-abstract class KwArgs {
-    public static function apply(callable $to, DispatchEvent $event) {
+abstract class NamedParameters {
+    public static function apply(callable $handler, DispatchEvent $event) {
+        $namedParams = static::createNamedParams($event);
+        $arguments = static::createArguments($handler, $namedParams);
+        return call_user_func_array($handler, $arguments);
+    }
+
+    protected static function createNamedParams(DispatchEvent $event) {
         $params = $event->payload;
         $params['payload'] = $params;
         $params['event'] = $event;
         $params['uuid'] = $event->uuid;
         $params['timestamp'] = $event->timestamp;
-        $params = static::bindParams($to, $params);
-        return call_user_func_array($to, $params);
+        return $params;
     }
 
-    protected static function bindParams($method, $params) {
-        $method = static::reflectOn($method);
+    protected static function createArguments($target, $params) {
+        $method = static::reflectOn($target);
         $args = [];
         $missing = [];
-        $actionParams = [];
         foreach ($method->getParameters() as $param) {
             $name = $param->getName();
             if (array_key_exists($name, $params)) {
                 if ($param->isArray() || $name == 'payload') {
-                    $args[] = $actionParams[$name] = (array)$params[$name];
+                    $args[] = (array)$params[$name];
                 } elseif (!is_array($params[$name])) {
-                    $args[] = $actionParams[$name] = $params[$name];
+                    $args[] = $params[$name];
                 } else {
                     throw new Exception(\Yii::t('yii', 'Invalid data received for store handler parameter "{param}".', [
                         'param' => $name,

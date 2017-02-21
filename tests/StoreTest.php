@@ -1,7 +1,7 @@
 <?php
 
 
-use flux\Dispatcher;
+use aea\flux\Dispatcher;
 
 class StoreTest extends PHPUnit_Framework_TestCase {
     public static $store;
@@ -37,7 +37,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
     }
 }
 
-class Store extends \flux\Store {
+class Store extends aea\flux\Store {
     public $onDispatch;
 
     protected function onDispatch($payload) {

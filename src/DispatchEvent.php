@@ -1,14 +1,11 @@
 <?php
 
 
-namespace flux;
+namespace aea\flux;
 
 
 use Ramsey\Uuid\Uuid;
-use yii\base\Arrayable;
-use yii\base\ArrayableTrait;
 use yii\base\Event;
-use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 
 /**
