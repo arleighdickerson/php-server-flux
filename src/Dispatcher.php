@@ -13,6 +13,7 @@ use yii\helpers\VarDumper;
 class Dispatcher extends Component {
     const EVENT_BEFORE_DISPATCH = 'beforeDispatch';
     const EVENT_AFTER_DISPATCH = 'afterDispatch';
+    const EVENT_FAILED_DISPATCH = 'failedDispatch';
 
     private $_callbacks = [];
     private $_isDispatching = false;
@@ -73,15 +74,20 @@ class Dispatcher extends Component {
     }
 
     /**
-     * @param $payload
-     * @return void
+     * @param  DispatcherEvent|array $action
+     * @return string the processed event's uuid
+     * @throws \Exception
      */
-    public function dispatch($payload) {
+    public function dispatch($action) {
         $this->assert(
             !$this->_isDispatching,
             'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.'
         );
-        $event = new DispatcherEvent($payload);
+        /** @var array $payload */
+        /** @var DispatcherEvent $event */
+        list($payload, $event) = is_array($action)
+            ? [$action, new DispatcherEvent(['payload' => $action])]
+            : [$action->getPayload(), $action];
         $this->trigger(self::EVENT_BEFORE_DISPATCH, $event);
         if ($event->isValid) {
             $this->startDispatching($payload);
@@ -91,11 +97,15 @@ class Dispatcher extends Component {
                         $this->invokeCallback($id);
                     }
                 }
+                $this->trigger(self::EVENT_AFTER_DISPATCH, $event);
+            } catch (\Exception $e) {
+                $this->trigger(self::EVENT_FAILED_DISPATCH, $event);
+                throw $e;
             } finally {
                 $this->stopDispatching();
             }
-            $this->trigger(self::EVENT_AFTER_DISPATCH, $event);
         }
+        return $event->uuid;
     }
 
     /**
