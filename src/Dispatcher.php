@@ -74,7 +74,7 @@ class Dispatcher extends Component {
     }
 
     /**
-     * @param  DispatcherEvent|array $action
+     * @param  DispatchEvent|array $action
      * @return string the processed event's uuid
      * @throws \Exception
      */
@@ -83,27 +83,26 @@ class Dispatcher extends Component {
             !$this->_isDispatching,
             'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.'
         );
-        /** @var array $payload */
-        /** @var DispatcherEvent $event */
-        list($payload, $event) = is_array($action)
-            ? [$action, new DispatcherEvent(['payload' => $action])]
-            : [$action->getPayload(), $action];
+
+        $event = $action instanceof DispatchEvent
+            ? $action
+            : new DispatchEvent(['payload' => $action]);
+        /** @var DispatchEvent $event */
+
         $this->trigger(self::EVENT_BEFORE_DISPATCH, $event);
-        if ($event->isValid) {
-            $this->startDispatching($payload);
-            try {
-                foreach ($this->_callbacks as $id => $callback) {
-                    if (!$this->_isPending[$id]) {
-                        $this->invokeCallback($id);
-                    }
+        $this->startDispatching($event);
+        try {
+            foreach ($this->_callbacks as $id => $callback) {
+                if (!$this->_isPending[$id]) {
+                    $this->invokeCallback($id);
                 }
-                $this->trigger(self::EVENT_AFTER_DISPATCH, $event);
-            } catch (\Exception $e) {
-                $this->trigger(self::EVENT_FAILED_DISPATCH, $event);
-                throw $e;
-            } finally {
-                $this->stopDispatching();
             }
+            $this->trigger(self::EVENT_AFTER_DISPATCH, $event);
+        } catch (\Exception $e) {
+            $this->trigger(self::EVENT_FAILED_DISPATCH, $event);
+            throw $e;
+        } finally {
+            $this->stopDispatching();
         }
         return $event->uuid;
     }
@@ -122,12 +121,12 @@ class Dispatcher extends Component {
         $this->_isHandled[$id] = true;
     }
 
-    private function startDispatching($payload) {
+    private function startDispatching($event) {
         foreach ($this->_callbacks as $id => $callback) {
             $this->_isPending[$id] = false;
             $this->_isHandled[$id] = false;
         }
-        $this->_pendingPayload = $payload;
+        $this->_pendingPayload = $event;
         $this->_isDispatching = true;
     }
 

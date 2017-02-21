@@ -8,13 +8,17 @@ use yii\base\Exception;
 use yii\helpers\VarDumper;
 
 abstract class KwArgs {
-    public static function apply(callable $to, array $params) {
+    public static function apply(callable $to, DispatchEvent $event) {
+        $params = $event->payload;
+        $params['payload'] = $params;
+        $params['event'] = $event;
+        $params['uuid'] = $event->uuid;
+        $params['timestamp'] = $event->timestamp;
         $params = static::bindParams($to, $params);
         return call_user_func_array($to, $params);
     }
 
     protected static function bindParams($method, $params) {
-        $params['payload'] = $params;
         $method = static::reflectOn($method);
         $args = [];
         $missing = [];
@@ -22,7 +26,7 @@ abstract class KwArgs {
         foreach ($method->getParameters() as $param) {
             $name = $param->getName();
             if (array_key_exists($name, $params)) {
-                if ($param->isArray()) {
+                if ($param->isArray() || $name == 'payload') {
                     $args[] = $actionParams[$name] = (array)$params[$name];
                 } elseif (!is_array($params[$name])) {
                     $args[] = $actionParams[$name] = $params[$name];

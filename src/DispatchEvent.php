@@ -4,9 +4,12 @@
 namespace flux;
 
 
-use aea\assets\helpers\ArrayHelper;
 use Ramsey\Uuid\Uuid;
+use yii\base\Arrayable;
+use yii\base\ArrayableTrait;
 use yii\base\Event;
+use yii\base\NotSupportedException;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class DispatcherEvent
@@ -16,9 +19,7 @@ use yii\base\Event;
  * @property array $payload
  * @property int $timestamp
  */
-class DispatcherEvent extends Event {
-    public $isValid = true;
-
+class DispatchEvent extends Event {
     /**
      * @var boolean
      */
@@ -32,7 +33,6 @@ class DispatcherEvent extends Event {
     /**
      * @var array
      */
-
     private $_payload;
     /**
      * @var int
@@ -75,7 +75,7 @@ class DispatcherEvent extends Event {
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getPayload() {
         return $this->_payload;
@@ -88,4 +88,3 @@ class DispatcherEvent extends Event {
         return $this->_timestamp;
     }
 }
-
