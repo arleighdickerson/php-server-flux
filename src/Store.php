@@ -15,7 +15,7 @@ use yii\helpers\VarDumper;
  * Class Store
  * @package flux
  * @property Dispatcher $dispatcher
- * @property string $dispatcherToken
+ * @property string $dispatchToken
  */
 abstract class Store extends Component {
     const EVENT_ON_CHANGE = 'change';
@@ -47,14 +47,23 @@ abstract class Store extends Component {
         });
     }
 
+    /**
+     * @return Dispatcher
+     */
     public function getDispatcher() {
         return $this->_dispatcher;
     }
 
+    /**
+     * @return string
+     */
     public function getDispatchToken() {
         return $this->_dispatchToken;
     }
 
+    /**
+     * @return boolean
+     */
     public function hasChanged() {
         $this->assertDispatching();
         return $this->_changed;

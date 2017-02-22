@@ -31,15 +31,7 @@ abstract class NamedParameters {
         foreach ($method->getParameters() as $param) {
             $name = $param->getName();
             if (array_key_exists($name, $params)) {
-                if ($param->isArray() || $name == 'payload') {
-                    $args[] = (array)$params[$name];
-                } elseif (!is_array($params[$name])) {
-                    $args[] = $params[$name];
-                } else {
-                    throw new Exception(\Yii::t('yii', 'Invalid data received for store handler parameter "{param}".', [
-                        'param' => $name,
-                    ]));
-                }
+                $args[] = $params[$name];
                 unset($params[$name]);
             } elseif ($param->isDefaultValueAvailable()) {
                 $args[] = $actionParams[$name] = $param->getDefaultValue();

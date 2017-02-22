@@ -31,6 +31,7 @@ class DispatchEvent extends Event {
      * @var array
      */
     private $_payload;
+
     /**
      * @var int
      */

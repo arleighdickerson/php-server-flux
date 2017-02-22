@@ -4,6 +4,7 @@ namespace aea\flux;
 
 use yii\base\Component;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 
 /**
@@ -74,26 +75,29 @@ class Dispatcher extends Component {
     }
 
     /**
-     * @param  DispatchEvent|array $action
+     * @param  DispatchEvent|array|string $type
+     * @param  array $payload
      * @return string the processed event's uuid
      * @throws \Exception
      */
-    public function dispatch($action) {
+    public function dispatch($type, $payload = []) {
         $this->assert(
             !$this->_isDispatching,
             'Dispatch.dispatch(...): Cannot dispatch in the middle of a dispatch.'
         );
 
         /** @var DispatchEvent $event */
-        $event = $action instanceof DispatchEvent
-            ? $action
-            : new DispatchEvent(['payload' => $action]);
+        $event = $type instanceof DispatchEvent
+            ? $type
+            : new DispatchEvent([
+                'payload' => is_string($type) ? compact('type') + $payload : $type
+            ]);
 
         $this->trigger(self::EVENT_BEFORE_DISPATCH, $event);
         $this->startDispatching($event);
         try {
             foreach ($this->_callbacks as $id => $callback) {
-                if (!$this->_isPending[$id]) {
+                if (!ArrayHelper::getValue($this->_isPending, $id, false)) {
                     $this->invokeCallback($id);
                 }
             }

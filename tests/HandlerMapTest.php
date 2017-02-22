@@ -14,6 +14,7 @@ class HandlerMapTest extends PHPUnit_Framework_TestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
+        Yii::$container->setSingleton(Dispatcher::class);
         Yii::createObject(HandlerMappedStore::class);
     }
 

@@ -9,6 +9,7 @@ class StoreTest extends PHPUnit_Framework_TestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
+        Yii::$container->setSingleton(Dispatcher::class);
         static::$store = static::createStore();
     }
 

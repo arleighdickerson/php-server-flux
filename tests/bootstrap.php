@@ -9,6 +9,8 @@ defined('YII_APP_BASE_PATH') or define('YII_APP_BASE_PATH', __DIR__);
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
 
+Yii::setAlias('@runtime', __DIR__ . '/runtime');
+
 spl_autoload_register(function ($class) {
     $file = __DIR__ . '/' . str_replace("\\", "/", $class) . '.php';
     if (file_exists($file)) {
@@ -16,6 +18,5 @@ spl_autoload_register(function ($class) {
     }
     return false;
 });
-Yii::$container->setSingleton(Dispatcher::class);
 
 new yii\console\Application(require(__DIR__ . '/config.php'));
