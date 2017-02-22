@@ -37,8 +37,8 @@ class SagaTest extends PHPUnit_Framework_TestCase {
         $this->dispatch('end');
     }
 
-    protected function dispatch($a,$b=[]) {
-        Yii::$container->get(Dispatcher::class)->dispatch($a,$b);
+    protected function dispatch($a, $b = []) {
+        Yii::$container->get(Dispatcher::class)->dispatch($a, $b);
     }
 
 }

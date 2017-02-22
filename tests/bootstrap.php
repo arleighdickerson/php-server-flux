@@ -19,4 +19,19 @@ spl_autoload_register(function ($class) {
     return false;
 });
 
-new yii\console\Application(require(__DIR__ . '/config.php'));
+$app = new yii\console\Application(require(__DIR__ . '/config.php'));
+
+$sql = <<<SQL
+/*PRAGMA foreign_keys = TRUE;*/
+CREATE TABLE IF NOT EXISTS action (
+  uuid      TEXT NOT NULL UNIQUE PRIMARY KEY,
+  payload   TEXT NOT NULL,
+  timestamp FLOAT NOT NULL
+) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS chunk (
+  uuid    TEXT NOT NULL UNIQUE PRIMARY KEY, /*REFERENCES action (uuid),*/
+  content TEXT NOT NULL
+) WITHOUT ROWID;
+SQL;
+
+$app->getDb()->createCommand($sql)->execute();

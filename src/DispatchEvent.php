@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
  * @property boolean $isReplay
  * @property string $uuid
  * @property array $payload
- * @property int $timestamp
+ * @property float $timestamp
  */
 class DispatchEvent extends Event {
     /**
@@ -38,17 +38,22 @@ class DispatchEvent extends Event {
     private $_timestamp;
 
     public function __construct(array $config = []) {
-        $this->_payload = ArrayHelper::remove($config, 'payload');
-        $this->_timestamp = ArrayHelper::remove($config, 'timestamp');
-        $this->_uuid = ArrayHelper::remove($config, 'uuid');
-        $this->_isReplay = ArrayHelper::remove($config, 'isReplay', false);
+        static $props = [
+            'isReplay',
+            'uuid',
+            'payload',
+            'timestamp',
+        ];
+        foreach ($props as $prop) {
+            $this->{"_$prop"} = ArrayHelper::remove($config, $prop);
+        }
         parent::__construct($config);
     }
 
     public function init() {
         parent::init();
         if ($this->_timestamp === null) {
-            $this->_timestamp = microtime();
+            $this->_timestamp = microtime(true);
         }
         if ($this->_payload === null) {
             $this->_payload = [];
@@ -62,7 +67,7 @@ class DispatchEvent extends Event {
      * @return boolean
      */
     public function getIsReplay() {
-        return $this->_isReplay;
+        return boolval($this->_isReplay);
     }
 
     /**
@@ -80,7 +85,7 @@ class DispatchEvent extends Event {
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTimestamp() {
         return $this->_timestamp;

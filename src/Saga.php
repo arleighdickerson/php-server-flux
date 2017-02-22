@@ -5,6 +5,8 @@ namespace aea\flux;
 
 
 use yii\base\InvalidConfigException;
+use yii\caching\Dependency;
+use yii\caching\ExpressionDependency;
 use yii\helpers\ArrayHelper;
 
 abstract class Saga extends Store {
@@ -22,6 +24,9 @@ abstract class Saga extends Store {
         parent::__construct($config);
     }
 
+    /**
+     * @return string
+     */
     public function getSagaId() {
         return $this->_sagaId;
     }
@@ -31,6 +36,20 @@ abstract class Saga extends Store {
      */
     public function initialState() {
         return [];
+    }
+
+    /**
+     * @return Dependency|null
+     */
+    public function getDependency() {
+        return null;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDuration() {
+        return null;
     }
 
     /**

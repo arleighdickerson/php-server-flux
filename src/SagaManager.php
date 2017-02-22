@@ -20,7 +20,6 @@ class SagaManager extends Behavior {
      */
     public $cache = [
         'class' => FileCache::class,
-        'gcProbability' => 100,
         'keyPrefix' => '',
         'cacheFileSuffix' => '.saga'
     ];
@@ -131,7 +130,12 @@ class SagaManager extends Behavior {
             //$keyset = $this->cache->get('keyset');
             //$keyset[$saga->getSagaId()] = $saga->getSagaId();
             //$this->cache->set('keyset', $keyset);
-            $this->cache->set($saga->getSagaId(), [$saga->className(), $saga->initialState()]);
+            $this->cache->set(
+                $saga->getSagaId(),
+                [$saga->className(), $saga->initialState()],
+                $saga->getDuration(),
+                $saga->getDependency()
+            );
         });
     }
 
